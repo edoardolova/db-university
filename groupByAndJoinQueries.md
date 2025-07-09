@@ -27,3 +27,70 @@ SELECT COUNT(*) as `number_degree_courses`, `department_id`
 FROM `degrees`
 GROUP BY `department_id`;
 ```
+
+
+## JOIN
+
+## 1. Selezionare tutti gli studenti iscritti al Corso di Laurea in Economia (68)
+```sql
+SELECT `students`.*, `degrees`.`name` as `degree_name`
+FROM `students`
+JOIN `degrees` ON `students`.`degree_id` = `degrees`.`id` 
+WHERE `degrees`.`name` = "Corso di Laurea in Economia";
+```
+
+## 2. Selezionare tutti i Corsi di Laurea Magistrale del Dipartimento di Neuroscienze  (1)
+```sql
+SELECT `degrees`.*, `departments`.`name` as `departments_name`
+FROM `degrees`
+JOIN `departments` ON `degrees`.`department_id` = `departments`.`id`
+WHERE `departments`.`name` = 'Dipartimento di Neuroscienze' AND `degrees`.`level` = 'Magistrale';
+```
+
+## 3. Selezionare tutti i corsi in cui insegna Fulvio Amato (id=44) (11)
+```sql
+SELECT `courses`.* , CONCAT(`teachers`.`name`,' ', `teachers`.`surname`) as `teacher`
+FROM `courses`
+JOIN `course_teacher`  ON `course_teacher`.`course_id` = `courses`.`id` 
+JOIN `teachers` ON `course_teacher`.`teacher_id` = `teachers`.`id`
+WHERE `teachers`.`name` = 'FULVIO' AND `teachers`.`surname` = "Amato";
+```
+
+## 4. Selezionare tutti gli studenti con i dati relativi al corso di laurea a cui sono iscritti e il relativo dipartimento, in ordine alfabetico per cognome e nome 
+```sql
+SELECT `students`.*, `degrees`.*, `departments`.`name` AS `department_name`
+FROM `students`
+JOIN `degrees` ON `students`.`degree_id` = `degrees`.`id`
+JOIN `departments` ON `degrees`.`department_id` = `departments`.`id`
+ORDER BY `students`.`surname`, `students`.`name`;
+```
+
+## 5. Selezionare tutti i corsi di laurea con i relativi corsi e insegnanti
+```sql
+SELECT `degrees`.*,  
+`courses`.`name` AS `course_name`, 
+`courses`.`description` AS `course_description`,
+ `courses`.`period` AS `course_period`,
+ `courses`.`year` AS `course_year`, 
+ `courses`.`cfu` AS `course_cfu`,
+ CONCAT(`teachers`.`name`,' ', `teachers`.`surname`) AS `teacher`,
+ `teachers`.`phone` AS `teacher_phone`,
+ `teachers`.`email` AS `teacher_email`,
+ `teachers`.`office_address` AS `teacher_office_address`,
+ `teachers`.`office_number` AS `teacher_office_number` 
+ FROM `teachers`
+ JOIN `course_teacher` ON `course_teacher`.`teacher_id` = `teachers`.`id`
+ JOIN `courses`  ON `course_teacher`.`course_id` = `courses`.`id`
+ JOIN `degrees` ON `courses`.`degree_id` = `degrees`.`id`;
+```
+
+## 6. Selezionare tutti i docenti che insegnano nel Dipartimento di Matematica (54) 
+```sql
+ SELECT DISTINCT `teachers`.*   
+ FROM `teachers`
+ JOIN `course_teacher` ON `course_teacher`.`teacher_id` = `teachers`.`id`
+ JOIN `courses`  ON `course_teacher`.`course_id` = `courses`.`id`
+ JOIN `degrees` ON `courses`.`degree_id` = `degrees`.`id`
+ JOIN `departments` ON `degrees`.`department_id` = `departments`.`id`
+ WHERE `departments`.`name` = 'Dipartimento di Matematica';
+```
